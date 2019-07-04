@@ -1,5 +1,5 @@
 import pandas as pd
-from influxdb_etl import InfluxdbETL
+from etl.influxdb_etl import InfluxdbETL
 
 
 class CryptoDataDownloadETL(InfluxdbETL):

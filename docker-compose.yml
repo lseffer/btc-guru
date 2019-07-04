@@ -11,10 +11,11 @@ services:
     volumes:
     - ./influxdb-data:/var/lib/influxdb
 
-  app:
-    build: 
+  app-jobrunner:
+    build:
       .
-    command: ./btc_guru/entrypoint.sh
+    environment:
+      APP_COMPONENT: jobrunner
     restart: always
     depends_on:
       - database
@@ -22,4 +23,18 @@ services:
       - .env
     volumes:
       - ./btc_guru:/home/guru/btc_guru
-      - ./historical_data:/home/guru/historical_data
+
+  app-webserver:
+    build:
+      .
+    environment:
+      APP_COMPONENT: webserver
+    restart: always
+    depends_on:
+      - database
+    env_file:
+      - .env
+    volumes:
+      - ./btc_guru:/home/guru/btc_guru
+    ports:
+      - "5001:5001"

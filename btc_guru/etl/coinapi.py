@@ -1,6 +1,6 @@
 import requests
 from config import COINAPI_KEY
-from influxdb_etl import InfluxdbETL
+from etl.influxdb_etl import InfluxdbETL
 
 COINAPI_HISTORY_URL = "https://rest.coinapi.io/v1/ohlcv/{symbol}/history"
 COINAPI_SYMBOL = "{exchange_id}_SPOT_{asset_id_base}_{asset_id_quote}"

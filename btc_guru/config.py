@@ -8,6 +8,7 @@ HOME = os.getenv('HOME')
 INFLUXDB_USER = os.getenv('INFLUXDB_USER')
 INFLUXDB_USER_PASSWORD = os.getenv('INFLUXDB_USER_PASSWORD')
 COINAPI_KEY = os.getenv('COINAPI_KEY')
+APP_API_KEY = os.getenv('APP_API_KEY')
 
 
 def create_influxdb_client():
