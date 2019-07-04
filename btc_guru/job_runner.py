@@ -51,7 +51,7 @@ def coinapi_job_factory():
 
 if __name__ == '__main__':
     scheduler = SafeScheduler(logger=logger)
-    scheduler.every().hour.do(run_threaded, coinapi_job_factory)
+    scheduler.every().hour.at(':00').do(run_threaded, coinapi_job_factory)
     while True:
         logger.debug('Heartbeat 5 seconds')
         scheduler.run_pending()
