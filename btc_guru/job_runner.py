@@ -1,0 +1,58 @@
+from coinapi import CoinApiETL
+from schedule import Scheduler, Job
+import threading
+from traceback import format_exc
+from config import logger
+from typing import Callable
+import logging
+from datetime import datetime, timedelta
+import time
+
+
+class SafeScheduler(Scheduler):
+    """
+    An implementation of Scheduler that catches jobs that fail, logs their
+    exception tracebacks as errors, optionally reschedules the jobs for their
+    next run time, and keeps going.
+    Use this to run jobs that may or may not crash without worrying about
+    whether other jobs will run or if they'll crash the entire script.
+    """
+
+    def __init__(self, reschedule_on_failure: bool = True, logger: logging.Logger = None) -> None:
+        """
+        If reschedule_on_failure is True, jobs will be rescheduled for their
+        next run as if they had completed successfully. If False, they'll run
+        on the next run_pending() tick.
+        """
+        self.logger = logger
+        self.reschedule_on_failure = reschedule_on_failure
+        super().__init__()
+
+    def _run_job(self, job: Job) -> None:
+        try:
+            super()._run_job(job)
+        except Exception:
+            if self.logger:
+                self.logger.error(format_exc())
+            job.last_run = datetime.now()
+            job._schedule_next_run()
+
+
+def run_threaded(job_func: Callable) -> None:
+    job_thread = threading.Thread(target=job_func)
+    job_thread.start()
+
+
+def coinapi_job_factory():
+    capi = CoinApiETL(time_start=(datetime.now() - timedelta(hours=24)).isoformat()[:14] + '00:00',
+                      time_end=datetime.now().isoformat()[:14] + '00:00')
+    capi.job()
+
+
+if __name__ == '__main__':
+    scheduler = SafeScheduler(logger=logger)
+    scheduler.every().hour.do(run_threaded, coinapi_job_factory)
+    while True:
+        logger.debug('Heartbeat 5 seconds')
+        scheduler.run_pending()
+        time.sleep(5)

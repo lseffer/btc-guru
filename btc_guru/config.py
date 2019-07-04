@@ -7,6 +7,7 @@ import sys
 HOME = os.getenv('HOME')
 INFLUXDB_USER = os.getenv('INFLUXDB_USER')
 INFLUXDB_USER_PASSWORD = os.getenv('INFLUXDB_USER_PASSWORD')
+COINAPI_KEY = os.getenv('COINAPI_KEY')
 
 
 def create_influxdb_client():
@@ -18,6 +19,7 @@ def grouper(iterable, n, fillvalue=None):
     # grouper('ABCDEFG', 3, 'x') --> ABC DEF Gxx"
     args = [iter(iterable)] * n
     return zip_longest(*args, fillvalue=fillvalue)
+
 
 def setup_logging(level: int = logging.INFO) -> logging.Logger:
     log = logging.getLogger()
