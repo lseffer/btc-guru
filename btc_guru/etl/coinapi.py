@@ -1,6 +1,7 @@
 import requests
 from config import COINAPI_KEY
 from etl.influxdb_etl import InfluxdbETL
+from typing import Dict, List
 
 COINAPI_HISTORY_URL = "https://rest.coinapi.io/v1/ohlcv/{symbol}/history"
 COINAPI_SYMBOL = "{exchange_id}_SPOT_{asset_id_base}_{asset_id_quote}"
@@ -22,25 +23,26 @@ class CoinApiETL(InfluxdbETL):
         self.time_end = time_end
 
     @property
-    def endpoint(self):
+    def endpoint(self) -> str:
         symbol = COINAPI_SYMBOL.format(exchange_id=self.exchange_id,
                                        asset_id_base=self.asset_id_base,
                                        asset_id_quote=self.asset_id_quote)
         return COINAPI_HISTORY_URL.format(symbol=symbol)
 
-    def _create_request_parameters(self):
+    def _create_request_parameters(self) -> Dict:
         return dict(
             period_id=self.period_id,
             time_start=self.time_start,
             time_end=self.time_end
         )
 
-    def extract(self):
-        return requests.get(self.endpoint,
-                            params=self._create_request_parameters(),
-                            headers={"X-CoinAPI-Key": COINAPI_KEY}).json()
+    def extract(self) -> List[Dict]:
+        res: List[Dict] = requests.get(self.endpoint,
+                                       params=self._create_request_parameters(),
+                                       headers={"X-CoinAPI-Key": COINAPI_KEY}).json()
+        return res
 
-    def transform(self, data):
+    def transform(self, data: List[Dict]):
         data_transformed = []
         for record in data:
             json_body = {

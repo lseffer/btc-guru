@@ -1,5 +1,7 @@
 from etl import ETL
-from config import create_influxdb_client, grouper, logger
+from config import create_influxdb_client, logger
+from helpers import grouper
+from typing import Collection
 
 
 class InfluxdbETL(ETL):
@@ -7,7 +9,7 @@ class InfluxdbETL(ETL):
     def __init__(self):
         self.influxdb_client = create_influxdb_client()
 
-    def load(self, iterable, batch_size=10000):
+    def load(self, iterable: Collection, batch_size=10000) -> None:
         written_rows_count = 0
         influxdb_records = []
         for index, batch in enumerate(grouper(iterable, batch_size)):

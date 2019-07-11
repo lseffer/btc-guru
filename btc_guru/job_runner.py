@@ -43,7 +43,7 @@ def run_threaded(job_func: Callable) -> None:
     job_thread.start()
 
 
-def coinapi_job_factory():
+def coinapi_job_factory() -> None:
     capi = CoinApiETL(time_start=(datetime.now() - timedelta(hours=24)).isoformat()[:14] + '00:00',
                       time_end=datetime.now().isoformat()[:14] + '00:00')
     capi.job()

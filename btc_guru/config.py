@@ -1,5 +1,4 @@
 from influxdb import InfluxDBClient
-from itertools import zip_longest
 import os
 import logging
 import sys
@@ -13,13 +12,6 @@ APP_API_KEY = os.getenv('APP_API_KEY')
 
 def create_influxdb_client():
     return InfluxDBClient('database', 8086, INFLUXDB_USER, INFLUXDB_USER_PASSWORD, 'crypto')
-
-
-def grouper(iterable, n, fillvalue=None):
-    "Collect data into fixed-length chunks or blocks"
-    # grouper('ABCDEFG', 3, 'x') --> ABC DEF Gxx"
-    args = [iter(iterable)] * n
-    return zip_longest(*args, fillvalue=fillvalue)
 
 
 def setup_logging(level: int = logging.INFO) -> logging.Logger:

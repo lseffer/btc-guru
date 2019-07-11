@@ -9,7 +9,7 @@ class ETL(ABC):
         pass
 
     @abstractmethod
-    def transform(self, data: Any) -> None:
+    def transform(self, data: Any) -> Any:
         return data
 
     @abstractmethod

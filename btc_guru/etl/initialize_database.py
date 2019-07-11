@@ -1,14 +1,16 @@
 import pandas as pd
 from etl.influxdb_etl import InfluxdbETL
+from pandas import DataFrame
+from typing import List, Dict
 
 
 class CryptoDataDownloadETL(InfluxdbETL):
 
-    def extract(self):
+    def extract(self) -> DataFrame:
         return pd.read_csv('http://www.cryptodatadownload.com/cdd/gemini_BTCUSD_1hr.csv',
                            skiprows=1)
 
-    def transform(self, data):
+    def transform(self, data: DataFrame) -> List[Dict]:
         data_transformed = []
         for index, record in data.iterrows():
             json_body = {

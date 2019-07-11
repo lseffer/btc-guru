@@ -1,5 +1,7 @@
 from flask_jsontools import DynamicJSONEncoder
 from datetime import date, datetime
+from itertools import zip_longest
+from typing import Iterable
 
 
 class ApiJSONEncoder(DynamicJSONEncoder):
@@ -14,3 +16,10 @@ class ApiJSONEncoder(DynamicJSONEncoder):
 
         # Fallback
         return super(DynamicJSONEncoder, self).default(o)
+
+
+def grouper(iterable: Iterable, n: int, fillvalue=None):
+    "Collect data into fixed-length chunks or blocks"
+    # grouper('ABCDEFG', 3, 'x') --> ABC DEF Gxx"
+    args = [iter(iterable)] * n
+    return zip_longest(*args, fillvalue=fillvalue)
