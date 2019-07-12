@@ -2,7 +2,7 @@ FROM python:3.7-slim
 
 RUN useradd -ms /bin/bash guru \
     && apt-get update \
-    && apt-get install -y git netcat
+    && apt-get install -y git netcat build-essential
 
 COPY requirements.txt /requirements.txt
 COPY entrypoint.sh /entrypoint.sh
