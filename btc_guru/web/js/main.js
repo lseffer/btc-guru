@@ -51,7 +51,7 @@ function createChart(series) {
                 text: '1y'
             }, {
                 type: 'all',
-                text: 'All'
+                text: 'all'
             }],
             selected: 3
         },

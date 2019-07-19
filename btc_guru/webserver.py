@@ -49,7 +49,7 @@ app.wsgi_app = ReverseProxied(app.wsgi_app)  # type: ignore
 limiter = Limiter(
     app,
     key_func=get_remote_address,
-    default_limits=["100/day"]
+    default_limits=["5/10seconds"]
 )
 
 
