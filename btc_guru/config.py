@@ -1,4 +1,4 @@
-from influxdb import InfluxDBClient
+from influxdb import InfluxDBClient, DataFrameClient
 import os
 import logging
 import sys
@@ -7,11 +7,14 @@ HOME = os.getenv('HOME')
 INFLUXDB_USER = os.getenv('INFLUXDB_USER')
 INFLUXDB_USER_PASSWORD = os.getenv('INFLUXDB_USER_PASSWORD')
 COINAPI_KEY = os.getenv('COINAPI_KEY')
-APP_API_KEY = os.getenv('APP_API_KEY')
 
 
 def create_influxdb_client():
     return InfluxDBClient('database', 8086, INFLUXDB_USER, INFLUXDB_USER_PASSWORD, 'crypto')
+
+
+def create_influxdb_dataframe_client():
+    return DataFrameClient('database', 8086, INFLUXDB_USER, INFLUXDB_USER_PASSWORD, 'crypto')
 
 
 def setup_logging(level: int = logging.INFO) -> logging.Logger:

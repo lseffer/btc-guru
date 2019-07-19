@@ -1,5 +1,8 @@
 from flask import Flask, request, session, redirect, abort, url_for
 from flask_jsontools import jsonapi
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
+from helpers.database import InfluxdbApiQuery
 from datetime import timedelta
 from helpers import ApiJSONEncoder
 import os
@@ -40,14 +43,25 @@ class ReverseProxied(object):
         return self.app(environ, start_response)
 
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='web')
 app.json_encoder = ApiJSONEncoder
 app.wsgi_app = ReverseProxied(app.wsgi_app)  # type: ignore
+limiter = Limiter(
+    app,
+    key_func=get_remote_address,
+    default_limits=["100/day"]
+)
 
 
 @app.route('/')
+@limiter.exempt
 def index():
-    return "wassup"
+    return app.send_static_file('index.html')
+
+
+@app.route('/timeseries', methods=['GET'])
+def timeseries():
+    return InfluxdbApiQuery(request.args).query()
 
 
 if __name__ == '__main__':
