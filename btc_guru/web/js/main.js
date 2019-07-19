@@ -99,12 +99,12 @@ ajax_get('./timeseries?fields=open,high,low,close,volume', function (data) {
     var low_index = cols.indexOf("low")
     var close_index = cols.indexOf("close")
     var volume_index = cols.indexOf("volume")
-    var ohlc_data = data["data"].map(function (row) {
-        return [row[time_index], row[open_index], row[high_index], row[low_index], row[close_index]]
+    var ohlc_data = []
+    var volume_data = []
+    data["data"].forEach(function (row) {
+        ohlc_data.push([row[time_index], row[open_index], row[high_index], row[low_index], row[close_index]])
+        volume_data.push([row[time_index], row[volume_index]])
     });
-    var volume_data = data["data"].map(function (row) {
-        return [row[time_index], row[volume_index]]
-    })
     createChart([{
         type: 'candlestick',
         name: 'BTC/USD',
