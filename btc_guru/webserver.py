@@ -1,11 +1,8 @@
-from flask import Flask, request, session, redirect, abort, url_for
-from flask_jsontools import jsonapi
+from flask import Flask, request
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
-from helpers.database import InfluxdbApiQuery
-from datetime import timedelta
+from helpers.database import InfluxdbQuery
 from helpers import ApiJSONEncoder
-import os
 
 
 class ReverseProxied(object):
@@ -61,7 +58,8 @@ def index():
 
 @app.route('/timeseries', methods=['GET'])
 def timeseries():
-    return InfluxdbApiQuery(request.args).query()
+    result_df = InfluxdbQuery(request.args).query()
+    return result_df.to_json(orient='split', index=False)
 
 
 if __name__ == '__main__':

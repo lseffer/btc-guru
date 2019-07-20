@@ -1,18 +1,18 @@
 function ajax_get(url, callback) {
-    var xmlhttp = new XMLHttpRequest();
-    xmlhttp.onreadystatechange = function () {
-        if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+    var xhr = new XMLHttpRequest();
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState == 4 && xhr.status == 200) {
             try {
-                var data = JSON.parse(xmlhttp.responseText);
+                var data = JSON.parse(xhr.responseText);
             } catch (err) {
-                console.log(err.message + " in " + xmlhttp.responseText);
+                console.log(err.message + " in " + xhr.responseText);
                 return;
             }
             callback(data);
         }
     };
-    xmlhttp.open("GET", url, true);
-    xmlhttp.send();
+    xhr.open("GET", url, true);
+    xhr.send();
 }
 
 function createChart(series) {
