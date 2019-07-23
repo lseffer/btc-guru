@@ -1,5 +1,5 @@
 import unittest
-from ml.helpers import create_target, transform_rnn_sequences
+from ml.helpers import create_target, transform_rnn_sequences, split_dataframe_on_columns
 import pandas as pd
 import numpy as np
 
@@ -46,3 +46,18 @@ class TestTransformRNNSequences(unittest.TestCase):
     def test_transform_long(self):
         res = transform_rnn_sequences(self.long_mock_array_x, self.long_mock_array_y, lookback=36)
         self.assertEqual(res[0].shape, (65, 36, 100))
+
+
+class TestSplitDataframe(unittest.TestCase):
+
+    def setUp(self):
+        self.mock_data = pd.DataFrame(
+            data=[[1, 2], [2, 0], [3, 4], [5, -1]],
+            columns=['foo', 'close']
+        )
+
+    def test_split_dataframe_on_columns(self):
+        res = split_dataframe_on_columns(self.mock_data, ['close'])
+        self.assertEqual(res[0].columns.tolist(), ['foo'])
+        self.assertEqual(res[1].columns.tolist(), ['close'])
+        self.assertEqual(res[0].shape[0], self.mock_data.shape[0])

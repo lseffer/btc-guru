@@ -1,5 +1,5 @@
 from pandas import DataFrame
-from typing import Tuple
+from typing import Tuple, List
 from ta.wrapper import add_all_ta_features
 import numpy as np
 import pandas as pd
@@ -15,12 +15,13 @@ def create_preprocess_pipeline():
     ])
 
 
-def split_dataframe_on_column(dataframe: DataFrame, column_name: str) -> Tuple[DataFrame, DataFrame]:
-    return dataframe.loc[:, dataframe.columns != column_name], dataframe.loc[:, dataframe.columns == column_name]
+def split_dataframe_on_columns(dataframe: DataFrame, column_names: List) -> Tuple[DataFrame, DataFrame]:
+    return (dataframe.loc[:, ~dataframe.columns.isin(column_names)],
+            dataframe.loc[:, dataframe.columns.isin(column_names)][column_names])
 
 
-def create_target(X: DataFrame, lookahead=36, column_name='target') -> DataFrame:
-    X.loc[:, column_name] = X["close"] \
+def create_target(X: DataFrame, lookahead=36) -> DataFrame:
+    X.loc[:, 'target'] = X["close"] \
         .pct_change(periods=lookahead) \
         .shift(-lookahead)
     return X
@@ -40,7 +41,7 @@ def transform_rnn_sequences(X: np.ndarray, y: np.ndarray, lookback=36) -> Tuple[
     samples = X.shape[0] - lookback + 1
 
     X_reshaped: np.ndarray = np.zeros((samples, lookback, X.shape[1]))
-    y_reshaped: np.ndarray = np.zeros((samples))
+    y_reshaped: np.ndarray = np.zeros((samples, y.shape[1]))
 
     for i in range(samples):
         y_position = i + lookback
