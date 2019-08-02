@@ -1,6 +1,7 @@
 import requests
 from config import COINAPI_KEY
 from etl.influxdb_etl import InfluxdbETL
+from helpers.models import InfluxdbModel
 from typing import Dict, List
 
 COINAPI_HISTORY_URL = "https://rest.coinapi.io/v1/ohlcv/{symbol}/history"
@@ -45,20 +46,20 @@ class CoinApiETL(InfluxdbETL):
     def transform(self, data: List[Dict]):
         data_transformed = []
         for record in data:
-            json_body = {
-                "measurement": "ohlcv",
-                "tags": {
+            json_body = InfluxdbModel(  # type: ignore
+                measurement="ohlcv",
+                tags={
                     "asset": "btc"
                 },
-                "time": record.get("time_period_end"),
-                "fields": {
+                time=record.get("time_period_end"),
+                fields={
                     "open": record.get("price_open"),
                     "high": record.get("price_high"),
                     "low": record.get("price_low"),
                     "close": record.get("price_close"),
                     "volume": record.get("volume_traded")
                 }
-            }
+            ).schema
             data_transformed.append(json_body)
         return data_transformed
 

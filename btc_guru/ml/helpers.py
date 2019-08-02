@@ -6,11 +6,31 @@ import pandas as pd
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.impute import SimpleImputer
+from tensorflow.keras.layers import Dense, LSTM, Input
+from tensorflow.keras import Sequential
+import tensorflow_probability as tfp
+
+
+def build_model(input_shape=(30, 30), recurrent_layers=1, dense_layers=1, bayesian=False, activation='linear'):
+    model = Sequential()
+    model.add(Input(shape=input_shape))
+    for _ in range(recurrent_layers):
+        model.add(LSTM(16))
+    for _ in range(dense_layers):
+        model.add(Dense(32))
+    if bayesian:
+        model.add(tfp.layers.DenseFlipout(1, activation=activation))
+    else:
+        model.add(Dense(1, activation=activation))
+    model.compile(
+        optimizer='adam',
+        loss='logcosh')
+    return model
 
 
 def create_preprocess_pipeline():
     return Pipeline([
-        ('imputer', SimpleImputer(missing_values=np.nan, strategy='mean')),
+        ('imputer', SimpleImputer(missing_values=np.nan, strategy='median')),
         ('scaler', MinMaxScaler())
     ])
 
@@ -20,11 +40,11 @@ def split_dataframe_on_columns(dataframe: DataFrame, column_names: List) -> Tupl
             dataframe.loc[:, dataframe.columns.isin(column_names)][column_names])
 
 
-def create_target(X: DataFrame, lookahead=36) -> DataFrame:
-    X.loc[:, 'target'] = X["close"] \
+def create_target(dataframe: DataFrame, lookahead=36) -> DataFrame:
+    dataframe.loc[:, 'target'] = dataframe["close"] \
         .pct_change(periods=lookahead) \
         .shift(-lookahead)
-    return X
+    return dataframe
 
 
 def extract_features(dataframe: DataFrame) -> DataFrame:

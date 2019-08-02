@@ -1,6 +1,7 @@
 import unittest
 from helpers import grouper
 from helpers.database import InfluxdbQuery
+from helpers.models import InfluxdbModel
 import pandas as pd
 from unittest import mock
 
@@ -49,3 +50,32 @@ class InfluxdbApiQueryTest(unittest.TestCase):
         res = influxapi.query()
         self.assertEqual(res.columns.tolist(), ["time", "a", "b"])
         self.assertEqual(res.shape[0], 2)
+
+
+class TestInfluxdbModel(unittest.TestCase):
+
+    def test_create_default(self):
+        res = InfluxdbModel()
+        self.assertEqual(res.fields, {})
+        self.assertEqual(res.tags, {})
+        self.assertEqual(res.measurement, "")
+
+    def test_create(self):
+        time = 100.0
+        fields = {'asd': 1}
+        tags = {'asd': 1}
+        measurement = 'asd'
+        res = InfluxdbModel(time=time, fields=fields, tags=tags, measurement=measurement)
+        self.assertEqual(res.fields, fields)
+        self.assertEqual(res.tags, tags)
+        self.assertEqual(res.measurement, measurement)
+        self.assertEqual(res.schema["time"], 100.0)
+
+    def test_immutable(self):
+        time = 100.0
+        fields = {'asd': 1}
+        tags = {'asd': 1}
+        measurement = 'asd'
+        res = InfluxdbModel(time=time, fields=fields, tags=tags, measurement=measurement)
+        with self.assertRaises(Exception):
+            res.time = 10
