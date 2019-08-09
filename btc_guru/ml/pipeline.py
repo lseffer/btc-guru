@@ -1,26 +1,32 @@
 from sklearn.model_selection import train_test_split
 from tensorflow.keras.callbacks import EarlyStopping
-from tensorflow.keras.models import load_model
+from tensorflow.keras.models import load_model, save_model
 from ml.helpers import (create_preprocess_pipeline, extract_features,
                         split_dataframe_on_columns, transform_rnn_sequences,
                         build_model)
 from helpers.database import InfluxdbQuery
-from typing import Tuple
+from helpers.models import InfluxdbModel
+from typing import List, Dict
 import numpy as np
+from numpy import ndarray
 import joblib
 from etl.influxdb_etl import InfluxdbETL
+from datetime import datetime, timedelta
 
 # Job for training the preprocessor and model
-# 
+#
 
 # ETL for getting data, running preprocessing and writing predictions to database
 # Need to save timestamps for prediction for writing to database
 # Need to gracefully exit if there are no saved models
 
+
 class MLETL(InfluxdbETL):
 
     def __init__(self):
-        super(MLETL).__init__()
+        super().__init__()
+        self.time_points = None
+        self.close_values = None
         try:
             self.model = load_model('rnn_model.h5')
             self.preprocess_pipeline = joblib.load('preprocess_pipeline.pkl')
@@ -28,22 +34,39 @@ class MLETL(InfluxdbETL):
             self.model = None
             self.preprocess_pipeline = None
 
-    def extract(self):
+    def extract(self) -> ndarray:
         if self.preprocess_pipeline is None:
-            return []
-        input_data = InfluxdbQuery(dict(fields='open,high,low,close,volume'), 100000).query()
+            return
+        input_data = InfluxdbQuery(dict(fields='open,high,low,close,volume'), 96).query()
         input_data = input_data.sort_values(by='time', ascending=True).set_index('time')
+        self.close_values = input_data["close"].values
+        self.time_points = input_data.index.values
         input_data_features = extract_features(input_data)
         dataframe_x, dataframe_y = split_dataframe_on_columns(input_data_features, ['target'])
-        X = preprocess_pipeline.transform(dataframe_x.values)
+        X = self.preprocess_pipeline.transform(dataframe_x.values)
+        X_rnn, _ = transform_rnn_sequences(X, dataframe_y.values, lookback=48)
+        return X_rnn
 
-    def transform(self, data):
-        if self.model is None:
+    def transform(self, data: ndarray) -> List[Dict]:
+        if self.model is None or self.time_points is None or data is None:
             return []
-
-class MLPipeline():
-
-
+        data_transformed = []
+        predictions = self.model.predict(data).reshape(-1, 1)
+        for i in range(predictions.shape[0]):
+            json_body = InfluxdbModel(
+                measurement="predictions",
+                tags={
+                    "asset": "btc"
+                },
+                time=(datetime.fromtimestamp(self.time_points[i].astype(
+                    datetime) * 1e-9) + timedelta(hours=24)).timestamp(),
+                fields={
+                    "close_absolute": (1 + predictions[i, 0]) * self.close_values[i],
+                    "close_relative": predictions[i, 0]
+                }
+            ).schema
+            data_transformed.append(json_body)
+        return data_transformed
 
 
 def train_model():
@@ -70,7 +93,7 @@ def train_model():
                   batch_size=32,
                   callbacks=[EarlyStopping(restore_best_weights=True, patience=2)])
 
-    rnn_model.save('rnn_model.h5')
+    save_model(rnn_model, 'rnn_model.h5')
     return rnn_model, X_val, rnn_model.predict(X_val), y_val
 
 
@@ -78,5 +101,6 @@ if __name__ == '__main__':
     from ml.pipeline import train_model
     asd = train_model()
     import numpy as np
-    print(((np.sign(asd[2]) > 0.5) * 1.0 == ((np.sign(asd[3][:, 0].reshape(-1, 1)) > 0.5) * 1.0)).sum() / asd[2].shape[0])
+    print(((np.sign(asd[2]) > 0.5) * 1.0 ==
+           ((np.sign(asd[3][:, 0].reshape(-1, 1)) > 0.5) * 1.0)).sum() / asd[2].shape[0])
     print(np.quantile(asd[2], [0.1, 0.9]), np.quantile(asd[3][:, 0], [0.1, 0.9]))

@@ -14,7 +14,8 @@ import tensorflow_probability as tfp
 def build_model(input_shape=(30, 30), recurrent_layers=1, dense_layers=1, bayesian=False, activation='linear'):
     model = Sequential()
     model.add(Input(shape=input_shape))
-    for _ in range(recurrent_layers):
+    model.add(LSTM(16, input_shape=input_shape))
+    for _ in range(recurrent_layers - 1):
         model.add(LSTM(16))
     for _ in range(dense_layers):
         model.add(Dense(32))
@@ -40,7 +41,7 @@ def split_dataframe_on_columns(dataframe: DataFrame, column_names: List) -> Tupl
             dataframe.loc[:, dataframe.columns.isin(column_names)][column_names])
 
 
-def create_target(dataframe: DataFrame, lookahead=36) -> DataFrame:
+def create_target(dataframe: DataFrame, lookahead=24) -> DataFrame:
     dataframe.loc[:, 'target'] = dataframe["close"] \
         .pct_change(periods=lookahead) \
         .shift(-lookahead)
