@@ -7,12 +7,12 @@ class InfluxdbQuery():
 
     query_string = 'SELECT {fields} FROM {measurement} WHERE "asset"=\'{asset}\' ORDER BY time DESC LIMIT {limit}'
 
-    def __init__(self, request_parameters: Dict = {}, result_limit=10000) -> None:
+    def __init__(self, request_parameters: Dict = {}) -> None:
         self.request_parameters = request_parameters
         self.measurement = request_parameters.get('measurement', 'ohlcv')
         self.fields: str = ','.join(request_parameters.get('fields', '*').split(','))
         self.asset = request_parameters.get('asset', 'btc')
-        self.result_limit = result_limit
+        self.result_limit = request_parameters.get('result_limit', 10000)
 
     def _transform_dataframe(self, dataframe: DataFrame) -> DataFrame:
         dataframe_result = dataframe.reset_index() \

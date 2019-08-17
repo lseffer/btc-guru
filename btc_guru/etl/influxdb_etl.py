@@ -16,7 +16,7 @@ class InfluxdbETL(ETL):
             for record in batch:
                 if record:
                     influxdb_records.append(record)
-            self.influxdb_client.write_points(influxdb_records)
+            self.influxdb_client.write_points(influxdb_records, batch_size=1000)
             written_rows_count += len(influxdb_records)
             influxdb_records = []
             logger.info('InfluxDB load: {}/{} records written'.format(written_rows_count,

@@ -2,21 +2,19 @@ from pandas import DataFrame
 from typing import Tuple, List
 from ta.wrapper import add_all_ta_features
 import numpy as np
-import pandas as pd
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.impute import SimpleImputer
 from tensorflow.keras.layers import Dense, LSTM, Input
 from tensorflow.keras import Sequential
 import tensorflow_probability as tfp
+from functools import partial
 
 
-def build_model(input_shape=(30, 30), recurrent_layers=1, dense_layers=1, bayesian=False, activation='linear'):
+def build_model(input_shape=(30, 30), dense_layers=1, bayesian=False, activation='linear'):
     model = Sequential()
     model.add(Input(shape=input_shape))
     model.add(LSTM(16, input_shape=input_shape))
-    for _ in range(recurrent_layers - 1):
-        model.add(LSTM(16))
     for _ in range(dense_layers):
         model.add(Dense(32))
     if bayesian:
@@ -48,11 +46,10 @@ def create_target(dataframe: DataFrame, lookahead=24) -> DataFrame:
     return dataframe
 
 
-def extract_features(dataframe: DataFrame) -> DataFrame:
+def extract_features(dataframe: DataFrame, lookahead=24) -> DataFrame:
     return dataframe \
-        .pipe(create_target) \
+        .pipe(partial(create_target, lookahead=lookahead)) \
         .pipe(add_all_ta_features, *['open', 'high', 'low', 'close', 'volume']) \
-        .pipe(lambda df: df[~pd.isna(df['target'])]) \
         .pipe(lambda df: df.replace([np.inf, -np.inf], np.nan))
 
 

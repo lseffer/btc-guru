@@ -1,4 +1,6 @@
-from coinapi import CoinApiETL
+from etl.coinapi import CoinApiETL
+from etl.ml import MLETL
+from helpers.ml.train_model import MLTools
 from schedule import Scheduler, Job
 import threading
 from traceback import format_exc
@@ -52,6 +54,8 @@ def coinapi_job_factory() -> None:
 if __name__ == '__main__':
     scheduler = SafeScheduler(logger=logger)
     scheduler.every().hour.at(':00').do(run_threaded, coinapi_job_factory)
+    scheduler.every().hour.at(':10').do(run_threaded, MLETL().job)
+    scheduler.every().week().do(run_threaded, MLTools.train_model)
     while True:
         logger.debug('Heartbeat 5 seconds')
         scheduler.run_pending()

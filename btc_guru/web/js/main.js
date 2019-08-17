@@ -15,8 +15,8 @@ function ajax_get(url, callback) {
     xhr.send();
 }
 
-function createChart(series) {
-    Highcharts.stockChart('container', {
+function createChart(series, container_id) {
+    Highcharts.stockChart(container_id, {
         rangeSelector: {
             buttons: [{
                 type: 'hour',
@@ -114,5 +114,10 @@ ajax_get('./timeseries?fields=open,high,low,close,volume', function (data) {
         name: 'Volume',
         data: volume_data,
         yAxis: 1
-    }])
+    }],
+        'ohlcv_container')
+});
+
+ajax_get('./timeseries?fields=predicted_close_absolute,close&result_limit=1000', function (data) {
+    console.log(data);
 });
