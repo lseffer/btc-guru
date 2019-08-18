@@ -21,7 +21,7 @@ class MLTools():
     @staticmethod
     def train_model() -> None:
         preprocess_pipeline = create_preprocess_pipeline()
-        input_data = InfluxdbQuery(dict(fields='open,high,low,close,volume'), 100000).query()
+        input_data = InfluxdbQuery(dict(fields='open,high,low,close,volume', result_limit=100000)).query()
         input_data = input_data.sort_values(by='time', ascending=True).set_index('time')
         input_data_features = extract_features(input_data, lookahead=MLTools.lookahead)
         input_data_features = input_data_features.pipe(lambda df: df[~pd.isna(df['target'])])

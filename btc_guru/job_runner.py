@@ -51,11 +51,21 @@ def coinapi_job_factory() -> None:
     capi.job()
 
 
+def mletl_job_factory() -> None:
+    mletl = MLETL()
+    mletl.job()
+
+
+def ml_training_job_fatory() -> None:
+    mlt = MLTools()
+    mlt.train_model()
+
+
 if __name__ == '__main__':
     scheduler = SafeScheduler(logger=logger)
-    scheduler.every().hour.at(':00').do(run_threaded, coinapi_job_factory)
-    scheduler.every().hour.at(':10').do(run_threaded, MLETL().job)
-    scheduler.every().week().do(run_threaded, MLTools.train_model)
+    scheduler.every().hour.at(":00").do(run_threaded, coinapi_job_factory)
+    scheduler.every().hour.at(":10").do(run_threaded, mletl_job_factory)
+    scheduler.every().sunday.at("00:00").do(run_threaded, ml_training_job_fatory)
     while True:
         logger.debug('Heartbeat 5 seconds')
         scheduler.run_pending()
