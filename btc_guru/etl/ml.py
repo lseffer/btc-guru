@@ -29,12 +29,12 @@ class MLETL(InfluxdbETL, MLTools):
             return
         input_data = InfluxdbQuery(dict(fields='open,high,low,close,volume', result_limit=MLTools.lookback * 2)).query()
         input_data = input_data.sort_values(by='time', ascending=True).set_index('time')
-        self.close_values = input_data["close"].values
         input_data_features = extract_features(input_data)
         dataframe_x, dataframe_y = split_dataframe_on_columns(input_data_features, ['target'])
         X = self.preprocess_pipeline.transform(dataframe_x.values)
         X_rnn, _ = transform_rnn_sequences(X, dataframe_y.values, lookback=MLTools.lookback)
         self.time_points = input_data.index.values[-X_rnn.shape[0]:]
+        self.close_values = input_data["close"].values[-X_rnn.shape[0]:]
         return X_rnn
 
     def transform(self, data: ndarray) -> List[Dict]:
@@ -51,7 +51,7 @@ class MLETL(InfluxdbETL, MLTools):
                 time=(datetime.fromtimestamp(self.time_points[i].astype(
                     datetime) * 1e-9) + timedelta(hours=MLTools.lookahead)).isoformat(),
                 fields={
-                    "predicted_close_absolute": (1 + predictions[i, 0]) * self.close_values[i],
+                    "predicted_close_absolute": (1 + predictions[i, 0] * 1.35) * self.close_values[i],
                     "predicted_close_relative": predictions[i, 0]
                 }
             ).schema

@@ -129,7 +129,7 @@ function create_prediction_chart(series, container_id) {
                 type: 'all',
                 text: 'all'
             }],
-            selected: 3
+            selected: 2
         },
         title: {
             text: 'BTC/USD close vs. predicted close'
@@ -196,7 +196,7 @@ ajax_get('./timeseries?fields=predicted_close_absolute,close&result_limit=1000',
     create_prediction_chart([{
         name: 'BTC/USD Close',
         data: close_data,
-        lineWidth: 2,
+        lineWidth: 4,
         tooltip: {
             valueDecimals: 2
         },
@@ -210,8 +210,9 @@ ajax_get('./timeseries?fields=predicted_close_absolute,close&result_limit=1000',
         data: predicted_close_data,
         lineWidth: 0,
         marker: {
+            symbol: 'circle',
             enabled: true,
-            radius: 6,
+            radius: 4,
             fillColor: '#8B0000'
         },
         tooltip: {
