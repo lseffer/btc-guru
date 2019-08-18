@@ -27,7 +27,7 @@ class MLETL(InfluxdbETL, MLTools):
     def extract(self) -> ndarray:
         if self.preprocess_pipeline is None:
             return
-        input_data = InfluxdbQuery(dict(fields='open,high,low,close,volume'), MLTools.lookback * 2).query()
+        input_data = InfluxdbQuery(dict(fields='open,high,low,close,volume', result_limit=MLTools.lookback * 2)).query()
         input_data = input_data.sort_values(by='time', ascending=True).set_index('time')
         self.close_values = input_data["close"].values
         input_data_features = extract_features(input_data)
