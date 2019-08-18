@@ -1,0 +1,15 @@
+body {
+    font-family: "Open Sans", Helvetica, Verdana, sans-serif;
+}
+
+.arrow-up {
+    border-style: solid;
+    border-width: 0 10px 10px 10px;
+    border-color: transparent transparent green transparent;
+}
+
+.arrow-down {
+    border-style: solid;
+    border-width: 10px 10px 0 10px;
+    border-color: red transparent transparent transparent;
+}

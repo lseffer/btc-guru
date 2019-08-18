@@ -18,8 +18,8 @@ class MLETL(InfluxdbETL, MLTools):
         self.time_points = None
         self.close_values = None
         try:
-            self.model = load_model('rnn_model.h5')
-            self.preprocess_pipeline = joblib.load('preprocess_pipeline.pkl')
+            self.model = load_model(MLTools.rnn_model_path)
+            self.preprocess_pipeline = joblib.load(MLTools.preprocess_pipeline_path)
         except (OSError, FileNotFoundError):
             self.model = None
             self.preprocess_pipeline = None

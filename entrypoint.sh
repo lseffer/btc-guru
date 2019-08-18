@@ -7,10 +7,7 @@ if [ "$APP_COMPONENT" = "jobrunner" ]; then
     python $HOME/btc_guru/etl/initialize_database.py
 
     echo 'Starting jobrunner'
-    while true; do
-        echo 'hello'
-        sleep 30
-    done
+    python $HOME/btc_guru/job_runner.py
 fi
 
 if [ "$APP_COMPONENT" = "webserver" ]; then

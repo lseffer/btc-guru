@@ -4,14 +4,19 @@ from sklearn.model_selection import train_test_split
 from helpers.ml import (extract_features, create_preprocess_pipeline, build_model,
                         split_dataframe_on_columns, transform_rnn_sequences)
 from helpers.database import InfluxdbQuery
+from config import HOME
 import pandas as pd
 import joblib
+import os
 
 
 class MLTools():
 
     lookback = 48
     lookahead = 24
+    binary_dir = os.path.join(HOME, 'btc_guru', 'bin')
+    preprocess_pipeline_path = os.path.join(binary_dir, 'preprocess_pipeline.pkl')
+    rnn_model_path = os.path.join(binary_dir, 'rnn_model.h5')
 
     @staticmethod
     def train_model() -> None:
@@ -30,7 +35,7 @@ class MLTools():
         X_train, y_train = transform_rnn_sequences(X_train, y_train, lookback=MLTools.lookback)
         X_val, y_val = transform_rnn_sequences(X_val, y_val, lookback=MLTools.lookback)
 
-        joblib.dump(preprocess_pipeline, 'preprocess_pipeline.pkl')
+        joblib.dump(preprocess_pipeline, MLTools.preprocess_pipeline_path)
 
         rnn_model = build_model(input_shape=X_train.shape[1:])
         rnn_model.fit(X_train, y_train,
@@ -39,4 +44,4 @@ class MLTools():
                       batch_size=32,
                       callbacks=[EarlyStopping(restore_best_weights=True, patience=2)])
 
-        save_model(rnn_model, 'rnn_model.h5')
+        save_model(rnn_model, MLTools.rnn_model_path)
