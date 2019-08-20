@@ -7,7 +7,7 @@ from datetime import datetime
 class InfluxdbModel():
     measurement: str = ""
     tags: Dict = field(default_factory=lambda: {})
-    time: float = datetime.utcnow().timestamp()
+    time: str = datetime.utcnow().isoformat()
     fields: Dict = field(default_factory=lambda: {})
 
     @property

@@ -3,7 +3,7 @@ import os
 import logging
 import sys
 
-HOME = os.getenv('HOME')
+HOME = os.getenv('HOME', '/home/guru')
 INFLUXDB_USER = os.getenv('INFLUXDB_USER')
 INFLUXDB_USER_PASSWORD = os.getenv('INFLUXDB_USER_PASSWORD')
 COINAPI_KEY = os.getenv('COINAPI_KEY')

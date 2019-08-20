@@ -1,5 +1,6 @@
 import unittest
-from ml.helpers import create_target, transform_rnn_sequences, split_dataframe_on_columns
+from tensorflow.keras.layers import Dense, LSTM
+from helpers.ml import create_target, transform_rnn_sequences, split_dataframe_on_columns, build_model
 import pandas as pd
 import numpy as np
 
@@ -61,3 +62,11 @@ class TestSplitDataframe(unittest.TestCase):
         self.assertEqual(res[0].columns.tolist(), ['foo'])
         self.assertEqual(res[1].columns.tolist(), ['close'])
         self.assertEqual(res[0].shape[0], self.mock_data.shape[0])
+
+
+class TestBuildModel(unittest.TestCase):
+
+    def test_return_type(self):
+        model = build_model()
+        self.assertEqual(type(model.layers[0]), LSTM)
+        self.assertEqual(type(model.layers[-1]), Dense)
