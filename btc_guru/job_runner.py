@@ -1,6 +1,6 @@
 from etl.coinapi import CoinApiETL
 from etl.ml import MLETL
-from helpers.ml.train_model import MLTools
+from helpers.ml.tools import MLTools
 from schedule import Scheduler, Job
 import threading
 from traceback import format_exc
