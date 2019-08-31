@@ -14,10 +14,10 @@ class TestCreateTarget(unittest.TestCase):
         )
 
     def test_transform(self):
-        res = create_target(self.mock_data, lookahead=1)
+        res = create_target(self.mock_data)
         self.assertEqual(res.columns.tolist(), ['foo', 'close', 'target'])
-        self.assertEqual(res.iloc[0, 2], -1)
-        self.assertEqual(res.iloc[2, 2], -1.25)
+        self.assertEqual(res.iloc[0, 2], 2)
+        self.assertEqual(res.iloc[2, 2], 4)
 
 
 class TestTransformRNNSequences(unittest.TestCase):
@@ -39,14 +39,16 @@ class TestTransformRNNSequences(unittest.TestCase):
         self.long_mock_array_y = np.zeros((100, 1))
 
     def test_transform(self):
-        res = transform_rnn_sequences(self.mock_array_x, self.mock_array_y, lookback=2)
-        self.assertEqual(res[0].shape, (3, 2, 2))
+        res = transform_rnn_sequences(self.mock_array_x, self.mock_array_y, lookback=2, lookahead=1)
+        self.assertEqual(res[0].shape, (2, 2, 2))
+        self.assertEqual(res[1].shape, (2, 1))
         self.assertEqual(res[0][0, 1, 0], 2)
         self.assertEqual(res[0][0, 1, 1], 3)
 
     def test_transform_long(self):
-        res = transform_rnn_sequences(self.long_mock_array_x, self.long_mock_array_y, lookback=36)
-        self.assertEqual(res[0].shape, (65, 36, 100))
+        res = transform_rnn_sequences(self.long_mock_array_x, self.long_mock_array_y, lookback=36, lookahead=24)
+        self.assertEqual(res[0].shape, (41, 36, 100))
+        self.assertEqual(res[1].shape, (41, 24))
 
 
 class TestSplitDataframe(unittest.TestCase):
