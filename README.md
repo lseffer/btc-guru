@@ -6,6 +6,9 @@ Predicting the price of `BTC/USD` price using historical OHLCV (open, high, low,
 
 I might return to this project to add more transparency about the error metrics and some backtesting.
 
+**Update 2 August 2019:**
+Scaling the output variable prior to fitting. Now fitting a stacked LSTM neural net outputing the next 24 hours of closing prices. Performance went up considerably with this method, and it's no longer reliant on the past movements of the closing price as much. Every hour I'm delivering predictions for the next 24 hours.
+
 **Update August 2019:**
 Currently predicting the percentage movement in `BTC/USD` 24 hours ahead. This proved to have some problems as the model mostly predicts small movements centered around 0. A better approach might be to try and predict in what percentile the percent change will be based on all earlier historical price movements. That way the model might also guess very high or very low values.
 
