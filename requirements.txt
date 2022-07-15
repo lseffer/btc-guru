@@ -6,7 +6,7 @@ Click==7.0
 cloudpickle==1.2.1
 dask==2.1.0
 decorator==4.4.0
-distributed==2.1.0
+distributed==2021.10.0
 Flask==1.0.3
 flask-jsontools==0.1.1.post0
 Flask-Limiter==1.0.1
