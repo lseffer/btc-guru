@@ -50,7 +50,7 @@ statsmodels==0.10.0
 ta==0.4.5
 tblib==1.4.0
 tensorboard==1.14.0
-tensorflow==1.15.2
+tensorflow==2.9.3
 tensorflow-estimator==1.14.0
 termcolor==1.1.0
 toolz==0.10.0
